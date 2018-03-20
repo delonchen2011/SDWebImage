@@ -13,9 +13,8 @@
 #import <SDWebImage/MKAnnotationView+WebCache.h>
 #import <SDWebImage/UIButton+WebCache.h>
 #import <SDWebImage/FLAnimatedImageView+WebCache.h>
-#import <SDWebImage/UIView+WebCache.h>
 
-static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
+@import FLAnimatedImage;
 
 @interface SDCategoriesTests : SDTestCase
 
@@ -27,7 +26,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"UIImageView setImageWithURL"];
     
     UIImageView *imageView = [[UIImageView alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage050.jpg"];
     [imageView sd_setImageWithURL:originalImageURL
                         completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                             expect(image).toNot.beNil();
@@ -43,7 +42,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"UIImageView setHighlightedImageWithURL"];
     
     UIImageView *imageView = [[UIImageView alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage051.jpg"];
     [imageView sd_setHighlightedImageWithURL:originalImageURL
                                    completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                                        expect(image).toNot.beNil();
@@ -59,7 +58,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"MKAnnotationView setImageWithURL"];
     
     MKAnnotationView *annotationView = [[MKAnnotationView alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage052.jpg"];
     [annotationView sd_setImageWithURL:originalImageURL
                              completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                                  expect(image).toNot.beNil();
@@ -75,7 +74,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"UIButton setImageWithURL normalState"];
     
     UIButton *button = [[UIButton alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage053.jpg"];
     [button sd_setImageWithURL:originalImageURL
                       forState:UIControlStateNormal
                      completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
@@ -92,7 +91,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"UIButton setImageWithURL highlightedState"];
     
     UIButton *button = [[UIButton alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage054.jpg"];
     [button sd_setImageWithURL:originalImageURL
                       forState:UIControlStateHighlighted
                      completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
@@ -109,7 +108,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"UIButton setBackgroundImageWithURL normalState"];
     
     UIButton *button = [[UIButton alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage055.jpg"];
     [button sd_setBackgroundImageWithURL:originalImageURL
                                 forState:UIControlStateNormal
                                completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
@@ -126,7 +125,7 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
     XCTestExpectation *expectation = [self expectationWithDescription:@"FLAnimatedImageView setImageWithURL"];
     
     FLAnimatedImageView *imageView = [[FLAnimatedImageView alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:@"https://www.interntheory.com/img/loading-small.gif"];
+    NSURL *originalImageURL = [NSURL URLWithString:@"https://raw.githubusercontent.com/liyong03/YLGIFImage/master/YLGIFImageDemo/YLGIFImageDemo/joy.gif"];
     
     [imageView sd_setImageWithURL:originalImageURL
                         completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
@@ -138,41 +137,6 @@ static void * SDCategoriesTestsContext = &SDCategoriesTestsContext;
                             [expectation fulfill];
                                 }];
     [self waitForExpectationsWithCommonTimeout];
-}
-
-- (void)testUIViewImageProgressKVOWork {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"UIView imageProgressKVO failed"];
-    UIView *view = [[UIView alloc] init];
-    NSURL *originalImageURL = [NSURL URLWithString:kTestJpegURL];
-    
-    [view.sd_imageProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(fractionCompleted)) options:NSKeyValueObservingOptionNew context:SDCategoriesTestsContext];
-    
-    // Clear the disk cache to force download from network
-    [[SDImageCache sharedImageCache] removeImageForKey:kTestJpegURL withCompletion:^{
-        [view sd_internalSetImageWithURL:originalImageURL placeholderImage:nil options:0 operationKey:nil setImageBlock:nil progress:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-            expect(view.sd_imageProgress.fractionCompleted).equal(1.0);
-            expect([view.sd_imageProgress.userInfo[NSStringFromSelector(_cmd)] boolValue]).equal(YES);
-            [expectation fulfill];
-        }];
-    }];
-    [self waitForExpectationsWithTimeout:kAsyncTestTimeout handler:^(NSError * _Nullable error) {
-        [view.sd_imageProgress removeObserver:self forKeyPath:NSStringFromSelector(@selector(fractionCompleted)) context:SDCategoriesTestsContext];
-    }];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if (context == SDCategoriesTestsContext) {
-        if ([keyPath isEqualToString:NSStringFromSelector(@selector(fractionCompleted))]) {
-            NSProgress *progress = object;
-            NSNumber *completedValue = change[NSKeyValueChangeNewKey];
-            expect(progress.fractionCompleted).equal(completedValue.doubleValue);
-            // mark that KVO is called
-            [progress setUserInfoObject:@(YES) forKey:NSStringFromSelector(@selector(testUIViewImageProgressKVOWork))];
-        }
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-    }
 }
 
 @end

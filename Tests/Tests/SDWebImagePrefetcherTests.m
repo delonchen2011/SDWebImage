@@ -24,27 +24,29 @@
 - (void)test02PrefetchMultipleImages {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Correct prefetch of multiple images"];
     
-    NSArray *imageURLs = @[@"http://via.placeholder.com/20x20.jpg",
-                           @"http://via.placeholder.com/30x30.jpg",
-                           @"http://via.placeholder.com/40x40.jpg"];
+    NSMutableArray *imageURLs = [NSMutableArray array];
     
-    __block NSUInteger numberOfPrefetched = 0;
+    for (int i=40; i<43; i++) {
+        NSString *imageURLString = [NSString stringWithFormat:@"https://s3.amazonaws.com/fast-image-cache/demo-images/FICDDemoImage%03d.jpg", i];
+        NSURL *imageURL = [NSURL URLWithString:imageURLString];
+        [imageURLs addObject:imageURL];
+    }
     
-    [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
-        [[SDWebImagePrefetcher sharedImagePrefetcher] prefetchURLs:imageURLs progress:^(NSUInteger noOfFinishedUrls, NSUInteger noOfTotalUrls) {
-            numberOfPrefetched += 1;
-            expect(numberOfPrefetched).to.equal(noOfFinishedUrls);
-            expect(noOfFinishedUrls).to.beLessThanOrEqualTo(noOfTotalUrls);
-            expect(noOfTotalUrls).to.equal(imageURLs.count);
-        } completed:^(NSUInteger noOfFinishedUrls, NSUInteger noOfSkippedUrls) {
-            expect(numberOfPrefetched).to.equal(noOfFinishedUrls);
-            expect(noOfFinishedUrls).to.equal(imageURLs.count);
-            expect(noOfSkippedUrls).to.equal(0);
-            [expectation fulfill];
-        }];
+    __block int numberOfPrefetched = 0;
+    
+    [[SDWebImagePrefetcher sharedImagePrefetcher] prefetchURLs:imageURLs progress:^(NSUInteger noOfFinishedUrls, NSUInteger noOfTotalUrls) {
+        numberOfPrefetched += 1;
+        expect(numberOfPrefetched).to.equal(noOfFinishedUrls);
+        expect(noOfFinishedUrls).to.beLessThanOrEqualTo(noOfTotalUrls);
+        expect(noOfTotalUrls).to.equal(imageURLs.count);
+    } completed:^(NSUInteger noOfFinishedUrls, NSUInteger noOfSkippedUrls) {
+        expect(numberOfPrefetched).to.equal(noOfFinishedUrls);
+        expect(noOfFinishedUrls).to.equal(imageURLs.count);
+        expect(noOfSkippedUrls).to.equal(0);
+        [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:kAsyncTestTimeout * 3 handler:nil];
+    [self waitForExpectationsWithCommonTimeout];
 }
 
 - (void)test03PrefetchWithEmptyArrayWillCallTheCompletionWithAllZeros {

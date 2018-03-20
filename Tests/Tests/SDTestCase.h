@@ -13,14 +13,11 @@
 #import <XCTest/XCTest.h>
 #import <Expecta/Expecta.h>
 
-FOUNDATION_EXPORT const int64_t kAsyncTestTimeout;
-FOUNDATION_EXPORT const int64_t kMinDelayNanosecond;
-FOUNDATION_EXPORT NSString * _Nonnull const kTestJpegURL;
-FOUNDATION_EXPORT NSString * _Nonnull const kTestPNGURL;
+extern const int64_t kAsyncTestTimeout;
 
 @interface SDTestCase : XCTestCase
 
 - (void)waitForExpectationsWithCommonTimeout;
-- (void)waitForExpectationsWithCommonTimeoutUsingHandler:(nullable XCWaitCompletionHandler)handler;
+- (void)waitForExpectationsWithCommonTimeoutUsingHandler:(XCWaitCompletionHandler)handler;
 
 @end
